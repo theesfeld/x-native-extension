@@ -76,7 +76,7 @@ export function findComposerEditable(node) {
  * @param {Element} post
  */
 const VIDEO_PLAYER_SELECTOR = "video, [data-testid='videoPlayer'], [data-testid='videoComponent']";
-const VIDEO_THUMB_RE = /\/(amplify_video_thumb|ext_tw_video_thumb|tweet_video_thumb|amplify_video|ext_tw_video|tweet_video)\/;
+const VIDEO_THUMB_RE = /\/(amplify_video_thumb|ext_tw_video_thumb|tweet_video_thumb|amplify_video|ext_tw_video|tweet_video)\//;
 
 /** @param {string} src */
 export function isVideoThumbUrl(src) {
