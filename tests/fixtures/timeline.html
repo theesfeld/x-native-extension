@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>timeline fixture</title>
+<main>
+  <article id="outer" data-testid="tweet" role="article">
+    <a href="/alice/status/1111111111111111111">time</a>
+    <div data-testid="tweetPhoto"><img id="outer-a" src="https://pbs.twimg.com/media/OUTERA?format=jpg&name=small" alt="" /></div>
+    <div data-testid="tweetPhoto"><img id="outer-b" src="https://pbs.twimg.com/media/OUTERB.jpg" alt="" /></div>
+    <img id="avatar" src="https://pbs.twimg.com/profile_images/999/abc_normal.jpg" alt="" />
+    <div id="quote" data-testid="quoteTweet">
+      <a href="/bob/status/2222222222222222222">quoted</a>
+      <div data-testid="tweetPhoto"><img id="quote-img" src="https://pbs.twimg.com/media/QUOTE.jpg:large" alt="" /></div>
+      <div data-testid="videoPlayer">
+        <video id="blob-video" src="blob:https://x.com/blob-id" poster="https://pbs.twimg.com/ext_tw_video_thumb/1700000000000000099/pu/img/abc.jpg"></video>
+      </div>
+    </div>
+  </article>
+  <article id="many" data-testid="tweet">
+    <a href="/ada/status/3333333333333333333">time</a>
+    <p id="many-text">two videos</p>
+    <video id="many-a" src="blob:https://x.com/a"></video>
+    <video id="many-b" src="blob:https://x.com/b"></video>
+  </article>
+  <article id="direct" data-testid="tweet">
+    <a href="/bea/status/4444444444444444444">time</a>
+    <div data-testid="videoComponent">
+      <video id="direct-video" poster="https://pbs.twimg.com/ext_tw_video_thumb/1700000000000000001/pu/img/abc.jpg">
+        <source src="https://video.twimg.com/ext_tw_video/1700000000000000001/pu/vid/1280x720/clip.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </article>
+  <div role="search">
+    <input id="search" data-testid="SearchBox_Search_Input" />
+  </div>
+  <div data-testid="tweetTextarea_0">
+    <div id="nested-editor" contenteditable="true">hi</div>
+  </div>
+  <textarea id="reply" aria-label="Reply"></textarea>
+</main>
