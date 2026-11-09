@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>X Native Extension</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">x.com</p>
+      <h1>X Native Extension</h1>
+    </header>
+    <label class="toggle">
+      <input id="paste" type="checkbox" />
+      <span>
+        <strong>Rewrite plain-text paste</strong>
+        <small id="status">Plain-text paste in a composer is inserted as typed text.</small>
+      </span>
+    </label>
+    <section>
+      <h2>Normal paste</h2>
+      <p>Hold <kbd>Shift</kbd> while pasting. <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> and <kbd>Shift</kbd>+<kbd>Insert</kbd> keep the browser's normal paste.</p>
+      <p>Or press <kbd id="shortcut">Alt+Shift+V</kbd> to make only the next composer paste normal. That also covers the right-click Paste menu.</p>
+      <button id="arm" type="button">Next paste is normal</button>
+    </section>
+    <section>
+      <h2>Right-click a post</h2>
+      <p>A photo offers download, open, and post for that image. A video or its poster offers the video versions. Text offers screenshot only. X’s own menu hides the browser menu, so these actions are drawn on the page. Post attaches the file for review and does not publish.</p>
+      <p>Shift+right-click keeps X’s menu. Alt+right-click opens the browser menu. <kbd id="shot">Alt+Shift+S</kbd> screenshots the post you just right-clicked.</p>
+    </section>
+    <p class="fine">Inserted text is one editing command, not hidden keystrokes. Details are on the options page.</p>
+    <p class="links"><a id="options" href="#">Options and limits</a></p>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
