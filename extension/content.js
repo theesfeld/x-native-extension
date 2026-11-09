@@ -38,7 +38,7 @@
 
   // src/lib/filename.js
   function sanitizeFilename(name) {
-    const cleaned = String(name).replace(/[\u0000-\u001f]/g, "").replace(/[\\/:*?"<>|]/g, "-").replace(/\.\.+/g, ".").replace(/^\.+/ , "").replace(/\s+/g, "-").slice(0, 120);
+    const cleaned = String(name).replace(/[\u0000-\u001f]/g, "").replace(/[\\/:*?"<>|]/g, "-").replace(/\.\.+/g, ".").replace(/^\.+/, "").replace(/\s+/g, "-").slice(0, 120);
     if (!cleaned || cleaned === ".") return "x-download";
     return cleaned;
   }
