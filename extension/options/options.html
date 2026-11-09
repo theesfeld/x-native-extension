@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>X Native Extension options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">X Native Extension</p>
+      <h1>What this extension actually does</h1>
+      <label class="toggle">
+        <input id="paste" type="checkbox" />
+        <span>Rewrite plain-text paste in post, reply, edit, and message composers</span>
+      </label>
+      <p id="status" class="status"></p>
+
+      <h2>Paste</h2>
+      <p>On <code>Ctrl</code>+<code>V</code> (and the Mac <code>Command</code>+<code>V</code> equivalent) inside a composer, the extension cancels the paste and inserts <code>text/plain</code> with <code>document.execCommand("insertText")</code>. Image and file pastes are left alone. The composer is recognized by X's composer test ids (<code>tweetTextarea_*</code>, message composer) or by an accessible name such as “Post text” or “Reply”. The search box is not a composer.</p>
+      <p>This is not invisible typing. The text arrives in one editing command, including newlines and emoji, rather than as one keystroke per character. Extension-created events that the extension dispatches itself are untrusted, and this extension does not dispatch fake <code>InputEvent</code>s. Sites can still look at timing, text length, focus, and their own editor model.</p>
+      <h3>Event sequence measured on Chrome 156 and Chrome for Testing 157</h3>
+      <p>For a rewritten paste of two lines, the page's own listeners saw:</p>
+      <ul>
+        <li>no <code>paste</code> event</li>
+        <li>no <code>beforeinput</code> event</li>
+        <li>a trusted <code>input</code> event, <code>inputType</code> <code>insertText</code>, <code>data</code> set to the first line</li>
+        <li>a trusted <code>input</code> event, <code>inputType</code> <code>insertText</code>, <code>data</code> <code>null</code>, for the line break</li>
+        <li>a trusted <code>input</code> event, <code>inputType</code> <code>insertText</code>, <code>data</code> set to the next line</li>
+      </ul>
+      <p><code>document.execCommand("undo")</code> then emitted one trusted <code>input</code> with <code>inputType</code> <code>historyUndo</code> and restored the previous text. <code>ClipboardEvent</code> did not expose <code>shiftKey</code>. Holding Alt with Ctrl+V did not paste at all on Linux Chrome, so Alt is not the escape hatch.</p>
+      <p>An editor that updates only from <code>beforeinput</code> will not see this insertion in its model, even if the DOM changes. An editor that reads the DOM on <code>input</code> will. Live x.com was not signed in during automated tests, so the shipped composer was not confirmed.</p>
+      <h3>Escape hatches</h3>
+      <ul>
+        <li>Turn the checkbox off.</li>
+        <li>Hold Shift while pasting (<code>Ctrl</code>+<code>Shift</code>+<code>V</code> or <code>Shift</code>+<code>Insert</code>).</li>
+        <li>Press the “next paste is normal” shortcut (default <code>Alt</code>+<code>Shift</code>+<code>V</code>), then paste once, including from the browser's Paste menu.</li>
+      </ul>
+      <p>Pastes longer than 100,000 characters are not rewritten. Nothing is auto-posted.</p>
+
+      <h2>Download full image</h2>
+      <p>The menu uses the photo under the pointer, or every photo that belongs to that post when the pointer is not on one. Quoted posts are separate: a click inside a quote does not download the outer post's pictures. Profile pictures and video posters are skipped. The extension requests the same <code>pbs.twimg.com/media</code> URL already in the page, with the public <code>name</code> parameter set to <code>orig</code>, then <code>large</code>, then the in-page URL. It checks the file bytes and will not save an HTML error page as a picture.</p>
+
+      <h2>Download full video</h2>
+      <p>The extension only downloads <code>https://video.twimg.com</code> addresses that are already on the video element or that the page actually requested (resource timing while that video is playing). It does not build a video URL from an id, call X's private API, or read cookies in JavaScript. Fetches are performed by the extension to that host, with the browser's normal cookie jar, and are refused if the response redirects elsewhere.</p>
+      <ul>
+        <li>A direct MP4 or WebM is saved as that format after the bytes are checked.</li>
+        <li>An unencrypted HLS playlist is fetched, the highest listed variant is chosen, and segments are joined. MPEG-TS is saved as <code>.ts</code>, not renamed to <code>.mp4</code>. An init segment plus fragmented MP4 is saved as <code>.mp4</code> only if the joined bytes look like MP4.</li>
+        <li>Encrypted playlists are refused.</li>
+        <li>A separate audio rendition is not muxed. The toast says the file may be silent.</li>
+        <li>A <code>blob:</code> or MediaSource player with no real file URL is refused. The buffer is not saved, because it is often only a fragment. Play the video and try again.</li>
+      </ul>
+
+      <h2>Open and post</h2>
+      <p>Open image in a new tab uses the full-size photo address. Open video uses a progressive MP4 or WebM the page already named. A blob address or a segmented stream is refused, and the post URL is not substituted. Post image and Post video fetch that file and place it on the composer’s file picker for review. They never click Post. The <code>change</code> event is untrusted, and a signed-in X composer was not tested. If a draft is already on the page, it is left alone and a new composer tab is opened. More than four images, a file over 32 MB, or a video that is not MP4 or WebM is refused instead of opening an empty composer.</p>
+      <h2>Right-click</h2>
+      <p>X replaces the browser menu with its own. A normal right-click on a post shows this extension’s actions on the page instead. A photo shows the image actions, a video or its poster shows the video actions, and text shows Screenshot post. Shift+right-click keeps X’s menu. Alt+right-click opens the browser menu, including Save image and this extension’s items.</p>
+      <h2>Screenshot post</h2>
+      <p>The browser captures the visible window as PNG (<code>captureVisibleTab</code>). The extension scrolls the selected post, crops to its box, stitches the slices, and restores the scroll position. Fixed and sticky bars that are not part of the post are hidden while capturing so they are not painted on top of it. Very tall posts are cut off with a message. The image shows the post as rendered, including the current video frame, not a downloaded video file. Expand “Show more” yourself if you want the hidden text in the picture.</p>
+      <p>A click on the on-page button does not grant <code>activeTab</code>. Press <code>Alt+Shift+S</code>, or choose Screenshot post from the browser menu (Alt+right-click). That invocation allows later on-page screenshots until the tab navigates. The extension does not request access to every website to get around this.</p>
+
+      <h2>Permissions</h2>
+      <table>
+        <thead><tr><th>Permission</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><code>storage</code></td><td>Remember the paste rewrite checkbox on this browser.</td></tr>
+          <tr><td><code>contextMenus</code></td><td>Register the post actions. The menu you see is drawn on the page, because X hides the browser menu.</td></tr>
+          <tr><td><code>downloads</code></td><td>Save the image, video, or PNG into the <code>X-Native</code> folder in your downloads.</td></tr>
+          <tr><td><code>activeTab</code></td><td>Chrome refuses <code>captureVisibleTab</code> without this or access to every site. It applies only to the tab where you invoked the extension, such as the context-menu click.</td></tr>
+          <tr><td><code>https://x.com/*</code> and <code>https://twitter.com/*</code></td><td>Run on X. These host permissions alone do not allow a screenshot.</td></tr>
+          <tr><td><code>https://pbs.twimg.com/*</code></td><td>Download the post photo the page already referenced.</td></tr>
+          <tr><td><code>https://video.twimg.com/*</code></td><td>Download a video file or HLS playlist the page already requested.</td></tr>
+        </tbody>
+      </table>
+      <p>No <code>tabs</code> history permission, no <code>&lt;all_urls&gt;</code>, no clipboard permission, no remote code, and no analytics server.</p>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
