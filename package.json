@@ -1,0 +1,21 @@
+{
+  "name": "x-native-extension",
+  "private": true,
+  "version": "1.1.1",
+  "description": "Unpacked Chromium extension for x.com: typed-style plain-text paste, and post image, video, and screenshot downloads.",
+  "type": "module",
+  "scripts": {
+    "icons": "python3 scripts/make-icons.py",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/unit/*.test.js",
+    "test:browser": "node tests/browser/run.mjs",
+    "test:all": "npm run build && npm test && npm run test:browser",
+    "pack": "node scripts/pack.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.11",
+    "linkedom": "^0.18.12",
+    "puppeteer-core": "^24.15.0"
+  },
+  "license": "UNLICENSED"
+}
